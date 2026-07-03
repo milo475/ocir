@@ -1,0 +1,111 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}{{ product.name }} — Objects{% endblock %}
+
+{% block content %}
+<section class="detail">
+    <div class="detail-media">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+        <span class="product-media-placeholder">{{ product.name|first }}</span>
+        {% endif %}
+    </div>
+
+    <div class="detail-info">
+        <span class="product-category">{{ product.category.name }}</span>
+        <h1>{{ product.name }}</h1>
+        <p class="detail-price">{{ product.price|floatformat:0|intcomma }}₮</p>
+
+        {% if product.description %}
+        <p class="detail-desc">{{ product.description }}</p>
+        {% endif %}
+
+        {% if variant_data %}
+        <form class="detail-form" method="post" action="{% url 'store:cart_add' %}">
+            {% csrf_token %}
+            <input type="hidden" name="variant_id" id="variant-id" value="">
+
+            <div class="option-group">
+                <span class="option-label">Хэмжээ</span>
+                <div class="option-row" id="size-options">
+                    {% for size in sizes %}
+                    <button type="button" class="option-btn" data-size="{{ size }}">{{ size }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="option-group">
+                <span class="option-label">Өнгө</span>
+                <div class="option-row" id="color-options">
+                    {% for color in colors %}
+                    <button type="button" class="option-btn" data-color="{{ color }}">{{ color }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <p class="stock-note" id="stock-note">Хэмжээ, өнгөө сонгоно уу.</p>
+
+            <div class="detail-actions">
+                <input type="number" name="quantity" id="quantity" value="1" min="1" class="qty-input" disabled>
+                <button type="submit" class="btn btn-primary" id="add-btn" disabled>Сагсанд нэмэх</button>
+            </div>
+        </form>
+
+        {{ variant_data|json_script:'variant-data' }}
+        <script>
+            const variants = JSON.parse(document.getElementById('variant-data').textContent);
+            const state = { size: null, color: null };
+            const stockNote = document.getElementById('stock-note');
+            const addBtn = document.getElementById('add-btn');
+            const qtyInput = document.getElementById('quantity');
+            const variantIdInput = document.getElementById('variant-id');
+
+            function findVariant() {
+                return variants.find(v => v.size === state.size && v.color === state.color);
+            }
+
+            function update() {
+                if (!state.size || !state.color) return;
+                const v = findVariant();
+                if (v && v.stock > 0) {
+                    stockNote.textContent = `Үлдэгдэл: ${v.stock} ширхэг`;
+                    stockNote.classList.remove('stock-out');
+                    variantIdInput.value = v.id;
+                    qtyInput.max = v.stock;
+                    qtyInput.value = Math.min(qtyInput.value, v.stock);
+                    qtyInput.disabled = false;
+                    addBtn.disabled = false;
+                } else {
+                    stockNote.textContent = v ? 'Дууссан' : 'Энэ хослол байхгүй';
+                    stockNote.classList.add('stock-out');
+                    variantIdInput.value = '';
+                    qtyInput.disabled = true;
+                    addBtn.disabled = true;
+                }
+            }
+
+            function bindOptions(containerId, key) {
+                const container = document.getElementById(containerId);
+                container.addEventListener('click', e => {
+                    const btn = e.target.closest('.option-btn');
+                    if (!btn) return;
+                    state[key] = btn.dataset[key];
+                    container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('option-active'));
+                    btn.classList.add('option-active');
+                    update();
+                });
+            }
+
+            bindOptions('size-options', 'size');
+            bindOptions('color-options', 'color');
+        </script>
+        {% else %}
+        <p class="stock-note stock-out">Одоогоор худалдаанд гараагүй.</p>
+        {% endif %}
+
+        <a class="detail-back" href="{% url 'store:product_list' %}">← Буцах</a>
+    </div>
+</section>
+{% endblock %}

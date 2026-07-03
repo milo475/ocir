@@ -1,0 +1,112 @@
+{% extends 'store/base.html' %}
+{% load static humanize %}
+
+{% block title %}Төлбөр — Objects{% endblock %}
+
+{% block content %}
+<section class="payment">
+    <div class="payment-head">
+        <h1>Төлбөр төлөх</h1>
+        <p class="payment-sub">
+            Захиалга <strong>№{{ order.pk }}</strong> бүртгэгдлээ.
+            Доорх аргуудын аль нэгээр төлбөрөө төлнө үү.
+        </p>
+    </div>
+
+    <div class="payment-grid">
+        <div class="payment-main">
+            <div class="method-tabs">
+                <button type="button" class="method-tab method-tab-active" data-method="qpay">
+                    QPay
+                </button>
+                <button type="button" class="method-tab" data-method="bank">
+                    Дансаар шилжүүлэх
+                </button>
+            </div>
+
+            <div class="method-panel" id="panel-qpay">
+                <div class="qr-box">
+                    <img src="{% static 'store/img/qr-mock.svg' %}" alt="QPay QR код">
+                </div>
+                <div class="qr-info">
+                    <h3>Апп-аараа уншуулна уу</h3>
+                    <p>
+                        Банкны апп эсвэл QPay апп-аар QR кодыг уншуулж
+                        <strong>{{ order.total|floatformat:0|intcomma }}₮</strong>
+                        төлнө үү. Төлбөр хийгдмэгц захиалга автоматаар баталгаажна.
+                    </p>
+                    <div class="bank-icons">
+                        <span class="bank-chip">Хаан</span>
+                        <span class="bank-chip">Голомт</span>
+                        <span class="bank-chip">ХХБ</span>
+                        <span class="bank-chip">Төрийн банк</span>
+                        <span class="bank-chip">М банк</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="method-panel" id="panel-bank" hidden>
+                <dl class="bank-details">
+                    <div class="bank-detail-row">
+                        <dt>Банк</dt>
+                        <dd>Хаан банк</dd>
+                    </div>
+                    <div class="bank-detail-row">
+                        <dt>Дансны дугаар</dt>
+                        <dd class="mono">5000 123 456</dd>
+                    </div>
+                    <div class="bank-detail-row">
+                        <dt>Хүлээн авагч</dt>
+                        <dd>OBJEKT ХХК</dd>
+                    </div>
+                    <div class="bank-detail-row">
+                        <dt>Дүн</dt>
+                        <dd>{{ order.total|floatformat:0|intcomma }}₮</dd>
+                    </div>
+                    <div class="bank-detail-row bank-detail-important">
+                        <dt>Гүйлгээний утга</dt>
+                        <dd class="mono">{{ order.pk }}, {{ order.phone }}</dd>
+                    </div>
+                </dl>
+                <p class="bank-note">
+                    Гүйлгээний утга дээр <strong>захиалгын дугаар болон утасны дугаараа</strong>
+                    заавал бичээрэй — үүгээр л бид таны төлбөрийг таньж баталгаажуулна.
+                </p>
+            </div>
+
+            <div class="payment-actions">
+                <a class="btn btn-primary" href="{% url 'store:order_success' %}">Би төлбөрөө төлсөн</a>
+            </div>
+            <p class="payment-hint">
+                Төлбөр хийгээгүй байсан ч захиалга тань 24 цагийн турш хадгалагдана.
+            </p>
+        </div>
+
+        <aside class="checkout-summary">
+            <h2>Захиалга №{{ order.pk }}</h2>
+            {% for item in order.items.all %}
+            <div class="summary-row">
+                <span>{{ item.variant.product.name }}
+                    <em>{{ item.variant.size }} / {{ item.variant.color }} × {{ item.quantity }}</em></span>
+                <span>{{ item.line_total|floatformat:0|intcomma }}₮</span>
+            </div>
+            {% endfor %}
+            <div class="summary-total">
+                <span>Нийт дүн</span>
+                <span>{{ order.total|floatformat:0|intcomma }}₮</span>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        document.querySelectorAll('.method-tab[data-method]').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('method-tab-active'));
+                tab.classList.add('method-tab-active');
+                document.querySelectorAll('.method-panel').forEach(p => p.hidden = true);
+                document.getElementById('panel-' + tab.dataset.method).hidden = false;
+            });
+        });
+    </script>
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Сагс — Objects{% endblock %}
+
+{% block content %}
+<section class="cart">
+    <h1>Сагс</h1>
+
+    {% if items %}
+    <div class="cart-rows">
+        {% for item in items %}
+        <div class="cart-row">
+            <div class="cart-thumb">
+                {% if item.variant.product.image %}
+                <img src="{{ item.variant.product.image.url }}" alt="{{ item.variant.product.name }}">
+                {% else %}
+                <span class="cart-thumb-placeholder">{{ item.variant.product.name|first }}</span>
+                {% endif %}
+            </div>
+            <div class="cart-row-info">
+                <a class="cart-row-name" href="{% url 'store:product_detail' item.variant.product.pk %}">
+                    {{ item.variant.product.name }}
+                </a>
+                <span class="cart-row-variant">{{ item.variant.size }} / {{ item.variant.color }}</span>
+                <span class="cart-row-price">{{ item.price|floatformat:0|intcomma }}₮</span>
+            </div>
+            <form class="cart-row-qty" method="post"
+                  action="{% url 'store:cart_update' item.variant.id %}">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="{{ item.quantity }}"
+                       min="1" max="{{ item.variant.stock }}" class="qty-input">
+                <button type="submit" class="pill">Шинэчлэх</button>
+                <button type="submit" name="remove" value="1" class="cart-remove">Устгах</button>
+            </form>
+            <span class="cart-row-total">{{ item.line_total|floatformat:0|intcomma }}₮</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart-footer">
+        <span class="cart-total-label">Нийт дүн</span>
+        <span class="cart-total">{{ cart_total|floatformat:0|intcomma }}₮</span>
+    </div>
+    <div class="cart-actions">
+        <a class="btn btn-outline" href="{% url 'store:product_list' %}">Үргэлжлүүлэн үзэх</a>
+        <a class="btn btn-primary" href="{% url 'store:checkout' %}">Захиалга хийх</a>
+    </div>
+    {% else %}
+    <p class="shop-empty">Сагс хоосон байна.</p>
+    <a class="btn btn-primary" href="{% url 'store:product_list' %}">Дэлгүүр үзэх</a>
+    {% endif %}
+</section>
+{% endblock %}

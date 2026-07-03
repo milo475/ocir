@@ -1,0 +1,36 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Objects for the Contemporary Life{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <h1>Objects for<br>the Contemporary<br>Life</h1>
+        <p class="hero-sub">
+            A curated selection of thoughtfully crafted objects for
+            modern living. Designed in London, delivered worldwide.
+        </p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="{% url 'store:product_list' %}">Shop Collection</a>
+        </div>
+        <dl class="hero-stats">
+            <div>
+                <dt>48+</dt>
+                <dd>New Arrivals</dd>
+            </div>
+            <div>
+                <dt>12</dt>
+                <dd>Collaborations</dd>
+            </div>
+            <div>
+                <dt>06</dt>
+                <dd>Design Awards</dd>
+            </div>
+        </dl>
+    </div>
+    <div class="hero-media">
+        <img src="{% static 'store/img/hero.jpg' %}" alt="Ceramic sculpture in warm sunlight">
+    </div>
+</section>
+{% endblock %}

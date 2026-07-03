@@ -1,0 +1,16 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Захиалга амжилттай — Objects{% endblock %}
+
+{% block content %}
+<section class="success">
+    <h1>Баярлалаа!</h1>
+    <p class="success-lead">
+        Таны <strong>№{{ order.pk }}</strong> захиалга бүртгэгдлээ.
+        Бид <strong>{{ order.phone }}</strong> дугаар руу залгаж баталгаажуулна.
+    </p>
+    <p class="success-total">Нийт дүн: {{ order.total|floatformat:0|intcomma }}₮</p>
+    <a class="btn btn-primary" href="{% url 'store:product_list' %}">Дэлгүүр рүү буцах</a>
+</section>
+{% endblock %}

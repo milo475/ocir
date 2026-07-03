@@ -1,0 +1,55 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Захиалга — Objects{% endblock %}
+
+{% block content %}
+<section class="checkout">
+    <h1>Захиалга</h1>
+
+    <div class="checkout-grid">
+        <form class="checkout-form" method="post">
+            {% csrf_token %}
+
+            {% if stock_errors %}
+            <div class="form-errors">
+                <p>Үлдэгдэл хүрэлцэхгүй байна:</p>
+                <ul>
+                    {% for error in stock_errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                <a href="{% url 'store:cart_detail' %}">Сагс руу буцаж засах →</a>
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <span class="field-error">{{ field.errors.0 }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary checkout-submit">
+                Захиалга баталгаажуулах
+            </button>
+        </form>
+
+        <aside class="checkout-summary">
+            <h2>Таны захиалга</h2>
+            {% for item in items %}
+            <div class="summary-row">
+                <span>{{ item.variant.product.name }}
+                    <em>{{ item.variant.size }} / {{ item.variant.color }} × {{ item.quantity }}</em></span>
+                <span>{{ item.line_total|floatformat:0|intcomma }}₮</span>
+            </div>
+            {% endfor %}
+            <div class="summary-total">
+                <span>Нийт дүн</span>
+                <span>{{ cart_total|floatformat:0|intcomma }}₮</span>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Shop — Objects{% endblock %}
+
+{% block content %}
+<section class="shop">
+    <div class="shop-head">
+        <h1>Shop Collection</h1>
+        <nav class="filter-pills">
+            <a href="{% url 'store:product_list' %}"
+               class="pill {% if not active_slug %}pill-active{% endif %}">All</a>
+            {% for category in categories %}
+            <a href="{% url 'store:product_list' %}?category={{ category.slug }}"
+               class="pill {% if active_slug == category.slug %}pill-active{% endif %}">{{ category.name }}</a>
+            {% endfor %}
+        </nav>
+    </div>
+
+    {% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+        <a class="product-card" href="{% url 'store:product_detail' product.pk %}">
+            <div class="product-media">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <span class="product-media-placeholder">{{ product.name|first }}</span>
+                {% endif %}
+            </div>
+            <div class="product-info">
+                <span class="product-category">{{ product.category.name }}</span>
+                <h2>{{ product.name }}</h2>
+                <span class="product-price">{{ product.price|floatformat:0|intcomma }}₮</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="shop-empty">Энэ ангилалд одоогоор бараа алга.</p>
+    {% endif %}
+</section>
+{% endblock %}
