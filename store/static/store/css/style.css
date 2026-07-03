@@ -884,7 +884,9 @@ body {
     }
 
     .hero-stats {
-        gap: 40px;
+        flex-wrap: wrap;
+        gap: 28px 36px;
+        margin-top: 48px;
     }
 
     .shop {
@@ -936,6 +938,31 @@ body {
 
     .checkout-summary {
         order: -1;
+    }
+
+    /* iOS автомат zoom-оос сэргийлж input-уудыг 16px болгоно */
+    .form-field input,
+    .form-field textarea,
+    .qty-input {
+        font-size: 16px;
+    }
+
+    /* Гол товчнуудыг бүтэн өргөн болгож дарахад хялбар болгоно */
+    .detail-actions .btn {
+        flex: 1;
+    }
+
+    .cart-actions {
+        flex-direction: column;
+    }
+
+    .cart-actions .btn {
+        text-align: center;
+    }
+
+    .payment-actions .btn {
+        flex: 1;
+        text-align: center;
     }
 
     .payment {
